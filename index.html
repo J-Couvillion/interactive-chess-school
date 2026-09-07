@@ -46,6 +46,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      width: 100%;
     }
 
     .board-card {
@@ -82,6 +83,7 @@
       display: none !important;
     }
 
+    h2 { margin: 0; color: #ffffff; font-size: 22px; }
     h3 { margin-bottom: 12px; color: #58a6ff; font-size: 18px; }
     p { font-size: 16px; line-height: 1.6; margin-bottom: 20px; color: var(--text-main); }
     
@@ -106,9 +108,17 @@
 <body>
 
 <div class="app-container">
+  
+  <!-- CLEAN STYLED HEADER CONTAINER -->
   <div class="classroom-header">
     <h2>♖ Interactive Chess School</h2>
-    <div>Level 1, Lesson 1</div>
+    
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <label for="lesson-select" style="color: var(--text-muted); font-size: 14px; font-weight: 600;">Lesson:</label>
+      <select id="lesson-select" style="background: #21262d; color: #ffffff; border: 1px solid var(--border-panel); padding: 8px 16px; border-radius: 6px; font-size: 14px; outline: none; cursor: pointer;">
+        <option value="l1-l1">L1.1: The Chessboard & Geometry</option>
+      </select>
+    </div>
   </div>
 
   <div class="board-card">
