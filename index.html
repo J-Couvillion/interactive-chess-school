@@ -48,7 +48,6 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      width: 100%;
     }
 
     .board-card {
@@ -74,9 +73,7 @@
       transition: transform 0.5s ease;
     }
 
-    .flipped-view {
-      transform: rotate(180deg);
-    }
+    .flipped-view { transform: rotate(180deg); }
 
     .lesson-content-card {
       background: var(--bg-panel);
@@ -122,14 +119,17 @@
     .btn-home:hover { background: #30363d; }
 
     .landmark-link { color: var(--accent-blue); text-decoration: none; font-weight: 700; cursor: pointer; }
-    .landmark-link:hover { text-decoration: underline; }
     .hl-orientation { background-color: var(--accent-green) !important; }
+    
+    .progress-dots { display: flex; gap: 8px; margin-bottom: 15px; }
+    .dot { width: 12px; height: 12px; border-radius: 50%; background: #21262d; border: 1px solid var(--border-panel); }
+    .dot.active { background: var(--accent-blue); border-color: var(--accent-blue); }
+    .dot.done { background: var(--accent-green); border-color: var(--accent-green); }
   </style>
 </head>
 <body>
 
 <div class="app-container">
-  
   <div class="classroom-header">
     <h2>♖ Interactive Chess School</h2>
     <div style="display: flex; align-items: center; gap: 10px;">
@@ -143,7 +143,7 @@
   <div class="board-card">
     <div class="chessboard-wrapper" id="board-perspective-wrapper">
       <div id="visual-board-canvas" style="background: repeating-linear-gradient(45deg, var(--sq-dark), var(--sq-dark) 40px, var(--sq-light) 40px, var(--sq-light) 80px); width:100%; height:100%; position: relative;">
-        <div id="square-orientation-anchor" style="position: absolute; bottom: 0; right: 0; width: 50px; height: 50px; border: 2px dashed #ffffff;" title="Corner Anchor"></div>
+        <div id="square-orientation-anchor" style="position: absolute; bottom: 0; right: 0; width: 50px; height: 50px; border: 2px dashed #ffffff;"></div>
       </div>
     </div>
   </div>
@@ -152,51 +152,95 @@
   <div class="lesson-content-card" id="view-concept">
     <button class="btn-home" onclick="returnToHome()">🏠 Home</button>
     <h3>1. Core Concept & Demo</h3>
-    <p>Welcome to Lesson 1! The absolute most fundamental rule states that the square in the bottom-right corner closest to each player must always be a light square. Click to highlight the <span class="landmark-link" onclick="highlightLandmark('orientation')">Board Orientation cornerstone</span>. Remember the classic coach rule: <strong>"White on the right!"</strong></p>
-    <button class="btn-action" onclick="goToStep(2)">Next Step: Try Guided Practice</button>
+    <p>Welcome to Lesson 1! Use the interactive links below to review the layout guidelines. Remember the classic coach rule: <strong>"White on the right!"</strong></p>
+    <button class="btn-action" onclick="goToStep(2)">Next Step: Begin Multi-Square Practice</button>
   </div>
 
-  <!-- BLOCK 2: GUIDED PRACTICE (WE ARE COMPLETING THIS NOW) -->
+  <!-- BLOCK 2: MULTI-STEP GUIDED PRACTICE -->
   <div class="lesson-content-card hidden-panel" id="view-practice">
     <button class="btn-home" onclick="returnToHome()">🏠 Home</button>
-    <h3>2. Socratic Guided Practice</h3>
-    <p id="practice-instruction-text">Loading random perspective assignment...</p>
+    <h3>2. Guided Practice: Learn by Doing</h3>
     
-    <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 12px;">Simulate clicking a target zone on the board matrix:</p>
-    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-      <button class="btn-action" style="background:#21262d; border:1px solid var(--border-panel);" onclick="validateSquareClick('center')">Click Core Center Square</button>
-      <button class="btn-action" style="background:#21262d; border:1px solid var(--border-panel);" onclick="validateSquareClick('wrong')">Click Incorrect Outer Square</button>
+    <!-- Visual Progress Tracker -->
+    <div class="progress-dots">
+      <div class="dot" id="dot-0"></div>
+      <div class="dot" id="dot-1"></div>
+      <div class="dot" id="dot-2"></div>
+      <div class="dot" id="dot-3"></div>
+      <div class="dot" id="dot-4"></div>
+      <div class="dot" id="dot-5"></div>
+    </div>
+    
+    <p id="practice-instruction-text">Loading layout assignment...</p>
+    
+    <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+      <button class="btn-action" style="background:#21262d; border:1px solid var(--border-panel);" onclick="handleSimulatedClick(true)">[Simulate Correct Square Click]</button>
+      <button class="btn-action" style="background:#21262d; border:1px solid var(--border-panel); color:var(--text-muted);" onclick="handleSimulatedClick(false)">[Simulate Incorrect Square Click]</button>
     </div>
   </div>
 
-  <!-- BLOCK 3: MASTERY QUIZ (LOCKED PLACEHOLDER FOR NOW) -->
+  <!-- BLOCK 3: MASTERY QUIZ -->
   <div class="lesson-content-card hidden-panel" id="view-quiz">
     <button class="btn-home" onclick="returnToHome()">🏠 Home</button>
     <h3>3. Lesson Mastery Quiz</h3>
-    <p>Block 2 Complete! Standing by for Block 3 curriculum data instructions...</p>
+    <p>✓ Guided Practice complete! You accurately identified all empty board landmarks under randomized perspectives.</p>
+    <button class="btn-action" onclick="goToStep(1)">Return to Start</button>
   </div>
 </div>
 
 <script>
-  let currentPerspective = "white";
-
-  function highlightLandmark(type) {
-    const anchor = document.getElementById("square-orientation-anchor");
-    if (type === 'orientation') anchor.className = "hl-orientation";
-  }
+  let currentTaskIndex = 0;
+  const tasks = [
+    { name: "orientation", text: "Task 1 of 6: Click the crucial <strong>Board Orientation cornerstone</strong> (Remember: White on the right!)." },
+    { name: "files-ranks", text: "Task 2 of 6: Identify grid lines. Click any square that sits directly on the <strong>e-file</strong> or the <strong>4th rank</strong>." },
+    { name: "diagonals", text: "Task 3 of 6: Navigate along angles. Click any square forming the long <strong>a1-h8 diagonal track</strong>." },
+    { name: "center", text: "Task 4 of 6: Find the heart of the board. Click any of the <strong>4 Inner Center Squares</strong>." },
+    { name: "extended", text: "Task 5 of 6: Find the outer courtyard. Click any square within the <strong>Extended Center ring</strong>." },
+    { name: "quadrant", text: "Task 6 of 6: Target specific wings. Click any square inside <strong>Black's Kingside Quadrant</strong>." }
+  ];
 
   function returnToHome() {
-    document.getElementById("square-orientation-anchor").className = "";
+    currentTaskIndex = 0;
     document.getElementById("board-perspective-wrapper").classList.remove("flipped-view");
     goToStep(1);
   }
 
-  function validateSquareClick(clickedZone) {
-    if (clickedZone === 'center') {
-      alert("🎯 Correct! Excellent coordinate recognition under this perspective!");
-      goToStep(3); // Moves forward exclusively when correct!
+  function startNextTask() {
+    if (currentTaskIndex >= tasks.length) {
+      goToStep(3); // Unlocks Block 3 only when ALL 6 tasks are passed!
+      return;
+    }
+
+    // Update individual tracking dot icons
+    for (let i = 0; i < tasks.length; i++) {
+      const dot = document.getElementById(`dot-${i}`);
+      dot.className = "dot";
+      if (i < currentTaskIndex) dot.classList.add("done");
+      if (i === currentTaskIndex) dot.classList.add("active");
+    }
+
+    const wrapper = document.getElementById("board-perspective-wrapper");
+    const instructionText = document.getElementById("practice-instruction-text");
+    
+    // Roll a 50/50 dice to randomize perspective layout dynamically per click task
+    const isBlackPerspective = Math.random() >= 0.5;
+    
+    if (isBlackPerspective) {
+      wrapper.classList.add("flipped-view");
+      instructionText.innerHTML = `🔄 <strong>[Black's Perspective]</strong> All hints faded. ${tasks[currentTaskIndex].text}`;
     } else {
-      alert("❌ Incorrect square! Look closely at the board's ranks and files for this perspective and try again.");
+      wrapper.classList.remove("flipped-view");
+      instructionText.innerHTML = `⚪ <strong>[White's Perspective]</strong> All hints faded. ${tasks[currentTaskIndex].text}`;
+    }
+  }
+
+  function handleSimulatedClick(isCorrect) {
+    if (isCorrect) {
+      alert("🎯 Correct choice! Area successfully validated.");
+      currentTaskIndex++;
+      startNextTask();
+    } else {
+      alert("❌ Incorrect square coordinates! Analyze the perspective orientation carefully and try again.");
     }
   }
 
@@ -204,36 +248,18 @@
     const c1 = document.getElementById("view-concept");
     const c2 = document.getElementById("view-practice");
     const c3 = document.getElementById("view-quiz");
-    const wrapper = document.getElementById("board-perspective-wrapper");
 
     c1.classList.add("hidden-panel");
     c2.classList.add("hidden-panel");
     c3.classList.add("hidden-panel");
 
-    if (stepNumber === 1) {
-      c1.classList.remove("hidden-panel");
-      wrapper.classList.remove("flipped-view");
-    }
+    if (stepNumber === 1) c1.removeClassName || c1.classList.remove("hidden-panel");
     if (stepNumber === 2) {
       c2.classList.remove("hidden-panel");
-      
-      // RANDOM ROTATION ENGINE
-      const isBlackPerspective = Math.random() >= 0.5;
-      const instructionText = document.getElementById("practice-instruction-text");
-      
-      if (isBlackPerspective) {
-        wrapper.classList.add("flipped-view");
-        currentPerspective = "black";
-        instructionText.innerHTML = "🔄 <strong>The board has flipped randomly to Black's Perspective!</strong> All written hints have been faded. Find and click on any of the 4 core center squares based on this view.";
-      } else {
-        wrapper.classList.remove("flipped-view");
-        currentPerspective = "white";
-        instructionText.innerHTML = "⚪ <strong>The board stayed on White's Perspective!</strong> All written hints have been faded. Find and click on any of the 4 core center squares based on this view.";
-      }
+      currentTaskIndex = 0;
+      startNextTask();
     }
-    if (stepNumber === 3) {
-      c3.classList.remove("hidden-panel");
-    }
+    if (stepNumber === 3) c3.classList.remove("hidden-panel");
   }
 </script>
 
