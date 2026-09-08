@@ -71,10 +71,9 @@
       border-radius: 8px;
       overflow: hidden;
       border: 4px solid var(--border-panel);
-      transition: transform 0.5s ease; /* Smooth flipping transition effect */
+      transition: transform 0.5s ease;
     }
 
-    /* Black's perspective rotation class override */
     .flipped-view {
       transform: rotate(180deg);
     }
@@ -142,7 +141,6 @@
   </div>
 
   <div class="board-card">
-    <!-- The physical wrapper that will dynamically flip styles randomly -->
     <div class="chessboard-wrapper" id="board-perspective-wrapper">
       <div id="visual-board-canvas" style="background: repeating-linear-gradient(45deg, var(--sq-dark), var(--sq-dark) 40px, var(--sq-light) 40px, var(--sq-light) 80px); width:100%; height:100%; position: relative;">
         <div id="square-orientation-anchor" style="position: absolute; bottom: 0; right: 0; width: 50px; height: 50px; border: 2px dashed #ffffff;" title="Corner Anchor"></div>
@@ -158,24 +156,24 @@
     <button class="btn-action" onclick="goToStep(2)">Next Step: Try Guided Practice</button>
   </div>
 
-  <!-- BLOCK 2: GUIDED PRACTICE -->
+  <!-- BLOCK 2: GUIDED PRACTICE (WE ARE COMPLETING THIS NOW) -->
   <div class="lesson-content-card hidden-panel" id="view-practice">
     <button class="btn-home" onclick="returnToHome()">🏠 Home</button>
     <h3>2. Socratic Guided Practice</h3>
     <p id="practice-instruction-text">Loading random perspective assignment...</p>
-    <!-- SIMULATED SQUARE SELECTION BOXES FOR USER CLICKS -->
+    
+    <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 12px;">Simulate clicking a target zone on the board matrix:</p>
     <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-      <button class="btn-action" style="background:#21262d; border:1px solid var(--border-panel);" onclick="validateSquareClick('center')">Click Center Square (e4/d4/e5/d5)</button>
-      <button class="btn-action" style="background:#21262d; border:1px solid var(--border-panel);" onclick="validateSquareClick('wrong')">Click Corner Square (a1/h8)</button>
+      <button class="btn-action" style="background:#21262d; border:1px solid var(--border-panel);" onclick="validateSquareClick('center')">Click Core Center Square</button>
+      <button class="btn-action" style="background:#21262d; border:1px solid var(--border-panel);" onclick="validateSquareClick('wrong')">Click Incorrect Outer Square</button>
     </div>
   </div>
 
-  <!-- BLOCK 3: MASTERY QUIZ -->
+  <!-- BLOCK 3: MASTERY QUIZ (LOCKED PLACEHOLDER FOR NOW) -->
   <div class="lesson-content-card hidden-panel" id="view-quiz">
     <button class="btn-home" onclick="returnToHome()">🏠 Home</button>
     <h3>3. Lesson Mastery Quiz</h3>
-    <p>✓ Success! You successfully identified the correct empty board coordinates under pressure.</p>
-    <button class="btn-action" onclick="returnToHome()">Finish Lesson & Return Home</button>
+    <p>Block 2 Complete! Standing by for Block 3 curriculum data instructions...</p>
   </div>
 </div>
 
@@ -196,9 +194,9 @@
   function validateSquareClick(clickedZone) {
     if (clickedZone === 'center') {
       alert("🎯 Correct! Excellent coordinate recognition under this perspective!");
-      goToStep(3);
+      goToStep(3); // Moves forward exclusively when correct!
     } else {
-      alert("❌ Incorrect square! Look closely at the coordinates for this perspective and try again.");
+      alert("❌ Incorrect square! Look closely at the board's ranks and files for this perspective and try again.");
     }
   }
 
@@ -214,12 +212,12 @@
 
     if (stepNumber === 1) {
       c1.classList.remove("hidden-panel");
-      wrapper.classList.remove("flipped-view"); // Always white for core concept
+      wrapper.classList.remove("flipped-view");
     }
     if (stepNumber === 2) {
       c2.classList.remove("hidden-panel");
       
-      // RANDOM ROTATION ENGINE: 50% chance to flip to Black's perspective
+      // RANDOM ROTATION ENGINE
       const isBlackPerspective = Math.random() >= 0.5;
       const instructionText = document.getElementById("practice-instruction-text");
       
